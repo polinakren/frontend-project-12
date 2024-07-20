@@ -1,18 +1,53 @@
 import {
   Button, Form, Col, Container, Card, Row, FloatingLabel,
 } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
+import { useRef, useEffect, useState } from 'react';
+import axios from 'axios';
 
 import img from '../assets/avatar.jpg';
+import routes from '../routes';
 
 const Login = () => {
+  const inputRef = useRef();
+  const navigate = useNavigate();
+  const [authFailed, setAuthFailed] = useState(false);
+
+  useEffect(() => {
+    inputRef.current.focus();
+  }, []);
+
   const formik = useFormik({
     initialValues: {
       username: '',
       password: '',
     },
-    onSubmit: (values) => values,
+    onSubmit: async (values) => {
+      setAuthFailed(false);
+
+      try {
+        const response = await axios.post(routes.loginPath(), {
+          username: values.username,
+          password: values.password,
+        });
+
+        const { token } = response.data;
+        localStorage.setItem('token', token);
+
+        const getTokenInLocalStorage = localStorage.getItem('token');
+        if (getTokenInLocalStorage && getTokenInLocalStorage.length > 0) {
+          setAuthFailed(false);
+          navigate('/');
+        } else {
+          setAuthFailed(true);
+          navigate('/login');
+        }
+      } catch (e) {
+        console.log(e);
+        setAuthFailed(true);
+      }
+    },
   });
 
   return (
@@ -35,13 +70,12 @@ const Login = () => {
                     <FloatingLabel controlId="username" label="Ваш ник">
                       <Form.Control
                         type="text"
+                        ref={inputRef}
                         onChange={formik.handleChange}
                         value={formik.values.username}
-                        onBlur={formik.handleBlur}
-                        disabled={formik.isSubmitting}
+                        isInvalid={authFailed}
                         placeholder="username"
                         name="username"
-                        id="username"
                         autoComplete="username"
                         required
                       />
@@ -53,16 +87,14 @@ const Login = () => {
                         type="password"
                         onChange={formik.handleChange}
                         value={formik.values.password}
-                        onBlur={formik.handleBlur}
-                        disabled={formik.isSubmitting}
+                        isInvalid={authFailed}
                         placeholder="password"
                         name="password"
-                        id="password"
                         autoComplete="current-password"
                         required
                       />
                     </FloatingLabel>
-                    <Form.Control.Feedback type="invalid" className="invalid-feedback">не то</Form.Control.Feedback>
+                    {authFailed && <Form.Control.Feedback type="invalid" tooltip>Неверные имя пользователя или пароль</Form.Control.Feedback>}
                   </Form.Group>
                   <Button type="submit" disabled={formik.isSubmitting} variant="outline-primary" className="w-100 mb-3">Войти</Button>
                 </fieldset>
