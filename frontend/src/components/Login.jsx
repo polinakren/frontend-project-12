@@ -5,13 +5,16 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { useRef, useEffect, useState } from 'react';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
 
 import img from '../assets/avatar.jpg';
 import routes from '../routes';
+import { setToken, setUser } from '../slices/authSlice.js';
 
 const Login = () => {
   const inputRef = useRef();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [authFailed, setAuthFailed] = useState(false);
 
   useEffect(() => {
@@ -33,6 +36,8 @@ const Login = () => {
         });
 
         const { token } = response.data;
+        dispatch(setToken(token));
+        dispatch(setUser(values.username));
         localStorage.setItem('token', token);
 
         const getTokenInLocalStorage = localStorage.getItem('token');
