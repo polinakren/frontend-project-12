@@ -3,18 +3,26 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 
 import routes from '../routes';
-import { setChannels } from '../slices/channelSlice.js';
 import Channels from './Channels.jsx';
 import Messages from './Messages.jsx';
 import { getToken } from '../slices/authSlice.js';
+import {
+  setChannels, getShowModalAddChannel, getShowModalRenameChannel, getShowModalDeleteChannel,
+} from '../slices/channelSlice.js';
 import { loadMessages } from '../slices/messageSlice';
+import ModalAddChannel from './ModalAddChannel.jsx';
+import ModalRenameChannel from './ModalRenameChannel.jsx';
+import ModalDeleteChannel from './ModalDeleteChannel.jsx';
 
 const ChatPage = () => {
   const dispatch = useDispatch();
 
   const token = useSelector(getToken);
+  const isShowModalAddChannel = useSelector(getShowModalAddChannel);
+  const isShowModalRenameChannel = useSelector(getShowModalRenameChannel);
+  const isShowModalDeleteChannel = useSelector(getShowModalDeleteChannel);
 
-  const getChannels = async () => {
+  const getChannelsData = async () => {
     try {
       const response = await axios.get(routes.channelsPath(), {
         headers: {
@@ -28,7 +36,7 @@ const ChatPage = () => {
     }
   };
 
-  const getMessages = async () => {
+  const getMessagesData = async () => {
     try {
       const responseMessages = await axios.get(routes.messagesPath(), {
         headers: {
@@ -43,9 +51,9 @@ const ChatPage = () => {
   };
 
   useEffect(() => {
-    getChannels(token);
-    getMessages(token);
-  }, []);
+    getChannelsData(token);
+    getMessagesData(token);
+  }, [dispatch]);
 
   return (
     <div className="h-100">
@@ -57,31 +65,27 @@ const ChatPage = () => {
                 Hexlet Chat
               </a>
               <button type="button" className="btn btn-primary">
-                Выйти
+                <a href="/login">
+                  Выйти
+                </a>
               </button>
             </div>
           </nav>
           <div className="container h-100 my-4 overflow-hidden rounded shadow">
             <div className="row h-100 bg-white flex-md-row">
               <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
-                <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
-                  <b>Каналы</b>
-                  <button type="button" className="p-0 text-primary btn btn-group-vertical">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor">
-                      <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
-                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
-                    </svg>
-                    <span className="visually-hidden">+</span>
-                  </button>
-                </div>
                 <Channels />
               </div>
-              <Messages />
+              <div className="col p-0 h-100">
+                <Messages />
+              </div>
             </div>
           </div>
+          {isShowModalAddChannel && <ModalAddChannel />}
+          {isShowModalRenameChannel && <ModalRenameChannel />}
+          {isShowModalDeleteChannel && <ModalDeleteChannel />}
         </div>
       </div>
-      <div className="Toastify" />
     </div>
   );
 };

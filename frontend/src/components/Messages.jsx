@@ -4,28 +4,28 @@ import { Formik, Field, Form } from 'formik';
 import { Button } from 'react-bootstrap';
 import { io } from 'socket.io-client';
 
-import { getMessages, getMessageCount, addMessage } from '../slices/messageSlice';
+import { getMessages, addMessage, getCountOfMessages } from '../slices/messageSlice';
 import { getActiveChannelId, getActiveChannelName } from '../slices/channelSlice';
 
 const socket = io('http://localhost:3000');
 
 const Messages = () => {
   const dispatch = useDispatch();
-  const messages = useSelector(getMessages);
-  const amountOfMessages = useSelector(getMessageCount);
 
   const activeChannelName = useSelector(getActiveChannelName);
   const activeChannelId = useSelector(getActiveChannelId);
 
+  const messages = useSelector(getMessages);
+  const countOfMessages = useSelector((state) => getCountOfMessages(state, activeChannelId));
+
   useEffect(() => {
     socket.on('newMessage', (currentMessage) => {
-      console.log('Current newMessage>>>', currentMessage);
       dispatch(addMessage(currentMessage));
     });
     return () => {
       socket.off('newMessage');
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="col p-0 h-100">
@@ -38,7 +38,7 @@ const Messages = () => {
             </b>
           </p>
           <span className="text-muted">
-            {amountOfMessages}
+            {countOfMessages}
             сообщений
           </span>
         </div>
