@@ -5,7 +5,7 @@ import axios from 'axios';
 import routes from '../routes';
 import Channels from './Channels.jsx';
 import Messages from './Messages.jsx';
-import { getToken } from '../slices/authSlice.js';
+import { getToken, logoutUser } from '../slices/authSlice.js';
 import {
   setChannels, getShowModalAddChannel, getShowModalRenameChannel, getShowModalDeleteChannel,
 } from '../slices/channelSlice.js';
@@ -21,6 +21,10 @@ const ChatPage = () => {
   const isShowModalAddChannel = useSelector(getShowModalAddChannel);
   const isShowModalRenameChannel = useSelector(getShowModalRenameChannel);
   const isShowModalDeleteChannel = useSelector(getShowModalDeleteChannel);
+
+  const handleLogOut = () => {
+    dispatch(logoutUser());
+  };
 
   const getChannelsData = async () => {
     try {
@@ -64,7 +68,7 @@ const ChatPage = () => {
               <a className="navbar-brand" href="/">
                 Hexlet Chat
               </a>
-              <button type="button" className="btn btn-primary">
+              <button type="button" className="btn btn-primary" onClick={handleLogOut}>
                 <a href="/login">
                   Выйти
                 </a>

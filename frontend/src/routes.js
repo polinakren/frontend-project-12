@@ -5,6 +5,7 @@ const routes = {
   loginPagePath: () => '/login',
   channelsPath: () => [apiPath, 'channels'].join('/'),
   messagesPath: () => [apiPath, 'messages'].join('/'),
+  signUpPath: () => [apiPath, 'signup'].join('/'),
   loginPath: () => [apiPath, 'login'].join('/'),
 };
 
