@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import * as yup from 'yup';
 
 import routes from '../routes.js';
-import signUpImage from '../images/signup-image.jpg';
+import signUpImage from '../assets/signup-image.jpg';
 import { setToken, loginUser, logoutUser } from '../slices/authSlice';
 
 const SignUpPage = () => {
