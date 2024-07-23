@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 import {
   setActiveChannel,
@@ -15,6 +16,7 @@ import { getToken } from '../slices/authSlice';
 
 const ModalDeleteChannel = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const token = useSelector(getToken);
 
@@ -45,16 +47,16 @@ const ModalDeleteChannel = () => {
   return (
     <Modal show onHide={handleSetShowModalDeleteChannel} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Удалить канал</Modal.Title>
+        <Modal.Title>{t('channels.removeChannel')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className="lead">Уверены?</p>
+        <p className="lead">{t('modals.confirmation')}</p>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleSetShowModalDeleteChannel}>
-            Отменить
+            {t('modals.cancel')}
           </Button>
           <Button variant="danger" type="submit" disabled="" onClick={() => handleSetDeleteChannel(token, activeChannelForDelete.id)}>
-            Удалить
+            {t('modals.confirm')}
           </Button>
         </Modal.Footer>
       </Modal.Body>

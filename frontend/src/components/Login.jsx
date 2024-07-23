@@ -6,6 +6,8 @@ import { useFormik } from 'formik';
 import { useRef, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import * as Yup from "yup";
 
 import img from '../assets/avatar.jpg';
 import routes from '../routes';
@@ -16,10 +18,18 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [authFailed, setAuthFailed] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     inputRef.current.focus();
   }, []);
+
+  const schema = Yup.object().shape({
+    username: Yup.string()
+      .required(t('validation.required')),
+    password: Yup.string()
+      .required(t('validation.required')),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -65,21 +75,21 @@ const Login = () => {
                 <img
                   src={img}
                   className="rounded-сircle"
-                  alt="Log in page"
+                  alt={t('login.submit')}
                 />
               </div>
               <Form onSubmit={formik.handleSubmit} className="col-12 col-md-6 mt-3 mt-mb-0">
-                <h1 className="text-center mb-4">Войти</h1>
+                <h1 className="text-center mb-4">{t('login.submit')}</h1>
                 <fieldset disabled={formik.isSubmitting}>
                   <Form.Group className="form-floating mb-3">
-                    <FloatingLabel controlId="username" label="Ваш ник">
+                    <FloatingLabel controlId="username" label={t('login.username')}>
                       <Form.Control
                         type="text"
                         ref={inputRef}
                         onChange={formik.handleChange}
                         value={formik.values.username}
                         isInvalid={authFailed}
-                        placeholder="username"
+                        placeholder={t('login.username')}
                         name="username"
                         autoComplete="username"
                         required
@@ -87,29 +97,29 @@ const Login = () => {
                     </FloatingLabel>
                   </Form.Group>
                   <Form.Group className="form-floating mb-3">
-                    <FloatingLabel controlId="password" label="Пароль">
+                    <FloatingLabel controlId="password" label={t('login.password')}>
                       <Form.Control
                         type="password"
                         onChange={formik.handleChange}
                         value={formik.values.password}
                         isInvalid={authFailed}
-                        placeholder="password"
+                        placeholder={t('login.password')}
                         name="password"
                         autoComplete="current-password"
                         required
                       />
                     </FloatingLabel>
-                    {authFailed && <Form.Control.Feedback type="invalid" tooltip>Неверные имя пользователя или пароль</Form.Control.Feedback>}
+                    {authFailed && <Form.Control.Feedback type="invalid" tooltip>{t('login.authFailed')}</Form.Control.Feedback>}
                   </Form.Group>
-                  <Button type="submit" disabled={formik.isSubmitting} variant="outline-primary" className="w-100 mb-3">Войти</Button>
+                  <Button type="submit" disabled={formik.isSubmitting} variant="outline-primary" className="w-100 mb-3">{t('login.submit')}</Button>
                 </fieldset>
               </Form>
             </Card.Body>
             <Card.Footer className="p-4">
               <div className="text-center">
-                <span>Нет аккаунта?</span>
+                <span>{t('login.newToChat')}</span>
                 {' '}
-                <NavLink to="404">Регистрация</NavLink>
+                <NavLink to="404">{t('login.signup')}</NavLink>
               </div>
             </Card.Footer>
           </Card>

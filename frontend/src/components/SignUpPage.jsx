@@ -5,12 +5,14 @@ import { Button, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as yup from 'yup';
+import { useTranslation } from 'react-i18next';
 
 import routes from '../routes.js';
 import signUpImage from '../assets/signup-image.jpg';
 import { setToken, loginUser, logoutUser } from '../slices/authSlice';
 
 const SignUpPage = () => {
+  const { t } = useTranslation();
   const [nameError, setShowNameError] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -18,17 +20,17 @@ const SignUpPage = () => {
   const schema = yup.object().shape({
     username: yup
       .string()
-      .required('Обязательное поле')
-      .min(3, 'От 3 до 20 символов')
-      .max(20, 'От 3 до 20 символов'),
+      .required(t('signup.required'))
+      .min(3, t('signup.usernameConstraints'))
+      .max(20, t('signup.usernameConstraints')),
     password: yup
       .string()
-      .required('Обязательное поле')
-      .min(6, 'Не менее 6 символов'),
+      .required(t('signup.required'))
+      .min(6, t('signup.passMin')),
     confirmPassword: yup
       .string()
-      .required('Обязательное поле')
-      .oneOf([yup.ref('password'), null], 'Пароли должны совпадать'),
+      .required(t('signup.required'))
+      .oneOf([yup.ref('password'), null], t('signup.mustMatch')),
   });
 
   const handleSubmit = async (formValue) => {
@@ -72,7 +74,7 @@ const SignUpPage = () => {
     <div className="d-flex flex-column h-100">
       <nav className="shadow-sm navbar navbar-expand-lg navbar-light bg-white">
         <div className="container">
-          <a className="navbar-brand" href="/">Hexlet Chat</a>
+          <a className="navbar-brand" href="/">{t('hexletChat')}</a>
         </div>
       </nav>
 
@@ -82,16 +84,16 @@ const SignUpPage = () => {
             <div className="card shadow-sm">
               <div className="card-body row p-5">
                 <div>
-                  <img src={signUpImage} className="rounded-circle" alt="Регистрация" />
+                  <img src={signUpImage} className="rounded-circle" alt={t('signup.header')} />
                 </div>
                 <div className="col-12 col-md-6">
                   <Form onSubmit={formInit.handleSubmit}>
-                    <h1 className="text-center mb-4">Регистрация</h1>
+                    <h1 className="text-center mb-4">{t('signup.header')}</h1>
                     <Form.Group className="mb-3">
                       <Form.Control
                         name="username"
                         type="text"
-                        placeholder="Ваш ник"
+                        placeholder={t('login.username')}
                         autoComplete="username"
                         id="username"
                         onChange={formInit.handleChange}
@@ -107,7 +109,7 @@ const SignUpPage = () => {
                       <Form.Control
                         name="password"
                         type="password"
-                        placeholder="Пароль"
+                        placeholder={t('signup.password')}
                         id="password"
                         autoComplete="password"
                         onChange={formInit.handleChange}
@@ -123,7 +125,7 @@ const SignUpPage = () => {
                       <Form.Control
                         name="confirmPassword"
                         type="password"
-                        placeholder="Пароль"
+                        placeholder={t('signup.confirm')}
                         id="confirmPassword"
                         autoComplete="confirmPassword"
                         onChange={formInit.handleChange}
@@ -137,10 +139,10 @@ const SignUpPage = () => {
                       </Form.Control.Feedback>
                     </Form.Group>
                     <Button type="submit">
-                      Зарегистрироваться
+                      {t('signup.submit')}
                     </Button>
                     {nameError && (
-                      <div className="invalid-feedback" style={{ display: 'block', color: 'red' }}>Такой пользователь уже существует</div>
+                      <div className="invalid-feedback" style={{ display: 'block', color: 'red' }}>{t('signup.alreadyExists')}</div>
                     )}
                   </Form>
                 </div>

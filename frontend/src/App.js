@@ -7,6 +7,7 @@ import Login from './components/Login';
 import ChatPage from './components/ChatPage';
 import store from './slices/index.js';
 import SignUpPage from './components/SignUpPage';
+import './i18Init';
 
 const App = () => (
   <div className="d-flex flex-column h-100">

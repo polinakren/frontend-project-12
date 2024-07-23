@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 import routes from '../routes';
 import Channels from './Channels.jsx';
@@ -16,6 +17,7 @@ import ModalDeleteChannel from './ModalDeleteChannel.jsx';
 
 const ChatPage = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const token = useSelector(getToken);
   const isShowModalAddChannel = useSelector(getShowModalAddChannel);
@@ -66,11 +68,11 @@ const ChatPage = () => {
           <nav className="shadow-sm navbar navbar-expand-lg navbar-light bg-white">
             <div className="container">
               <a className="navbar-brand" href="/">
-                Hexlet Chat
+                {t('hexletChat')}
               </a>
               <button type="button" className="btn btn-primary" onClick={handleLogOut}>
                 <a href="/login">
-                  Выйти
+                  {t('logout')}
                 </a>
               </button>
             </div>
