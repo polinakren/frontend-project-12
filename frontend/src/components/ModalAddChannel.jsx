@@ -7,6 +7,7 @@ import {
   Formik, Field, Form, ErrorMessage,
 } from 'formik';
 import { useTranslation } from 'react-i18next';
+import filter from 'leo-profanity';
 
 import {
   selectChannels, setActiveChannel, setShowModalAddChannel, addChannel, setShowNotifyAddChannel,
@@ -15,6 +16,7 @@ import routes from '../routes.js';
 import { getToken } from '../slices/authSlice.js';
 
 const ModalAddChannel = () => {
+  filter.loadDictionary('ru');
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -25,7 +27,8 @@ const ModalAddChannel = () => {
   };
 
   const handleAddChannel = async (name) => {
-    const newChannel = { name };
+    const cleanedChannelName = filter.clean(name);
+    const newChannel = { name: cleanedChannelName };
     try {
       const response = await axios.post(routes.channelsPath(), newChannel, {
         headers: {

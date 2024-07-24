@@ -4,14 +4,21 @@ import { Formik, Field, Form } from 'formik';
 import { Button } from 'react-bootstrap';
 import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
+import filter from 'leo-profanity';
+import axios from 'axios';
 
 import { getMessages, addMessage, getCountOfMessages } from '../slices/messageSlice';
 import { getActiveChannelId, getActiveChannelName } from '../slices/channelSlice';
+import routes from '../routes';
+import { getToken, selectUser } from '../slices/authSlice';
 
 const socket = io('http://localhost:3000');
 
 const Messages = () => {
+  filter.loadDictionary('ru');
   const dispatch = useDispatch();
+  const token = useSelector(getToken);
+  const user = useSelector(selectUser);
   const { t } = useTranslation();
 
   const activeChannelName = useSelector(getActiveChannelName);
@@ -28,6 +35,26 @@ const Messages = () => {
       socket.off('newMessage');
     };
   }, [dispatch]);
+
+  const handleSubmitMessage = async (newMessage) => {
+    const cleanedBody = filter.clean(newMessage.body);
+    const useCleanMessage = {
+      ...newMessage,
+      body: cleanedBody,
+    };
+
+    try {
+      await axios.post(routes.messagesPath(), useCleanMessage, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const newMessageFunc = (value, channelId, username) => ({ body: value, channelId, username });
 
   return (
     <div className="col p-0 h-100">
@@ -58,7 +85,15 @@ const Messages = () => {
         <div className="mt-auto px-5 py-3">
           <Formik
             initialValues={{ message: '' }}
-            onSubmit={(values) => { console.log(values); }}
+            onSubmit={(values, { resetForm }) => {
+              const newMessage = newMessageFunc(
+                values.message,
+                activeChannelId,
+                user,
+              );
+              handleSubmitMessage(newMessage);
+              resetForm();
+            }}
           >
             {({ handleChange, handleBlur, values }) => (
               <Form noValidate className="py-1 border rounded-2">
