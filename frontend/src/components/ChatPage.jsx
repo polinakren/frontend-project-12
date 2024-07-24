@@ -2,13 +2,25 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { toast, Bounce, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import routes from '../routes';
 import Channels from './Channels.jsx';
 import Messages from './Messages.jsx';
-import { getToken, logoutUser } from '../slices/authSlice.js';
+import { getToken, logoutUser, selectIsAuthenticated } from '../slices/authSlice.js';
 import {
-  setChannels, getShowModalAddChannel, getShowModalRenameChannel, getShowModalDeleteChannel,
+  setChannels,
+  getShowModalAddChannel,
+  getShowModalRenameChannel,
+  getShowModalDeleteChannel,
+  getShowNotifyAddChannel,
+  getShowNotifyRenameChannel,
+  getShowNotifyDeleteChannel,
+  setShowNotifyAddChannel,
+  setShowNotifyRenameChannel,
+  setShowNotifyDeleteChannel,
 } from '../slices/channelSlice.js';
 import { loadMessages } from '../slices/messageSlice';
 import ModalAddChannel from './ModalAddChannel.jsx';
@@ -17,12 +29,17 @@ import ModalDeleteChannel from './ModalDeleteChannel.jsx';
 
 const ChatPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const token = useSelector(getToken);
   const isShowModalAddChannel = useSelector(getShowModalAddChannel);
   const isShowModalRenameChannel = useSelector(getShowModalRenameChannel);
   const isShowModalDeleteChannel = useSelector(getShowModalDeleteChannel);
+  const isAuthorization = useSelector(selectIsAuthenticated);
+  const isShowNotifyAddChannel = useSelector(getShowNotifyAddChannel);
+  const isShowNotifyRenameChannel = useSelector(getShowNotifyRenameChannel);
+  const isShowNotifyDeleteChannel = useSelector(getShowNotifyDeleteChannel);
 
   const handleLogOut = () => {
     dispatch(logoutUser());
@@ -61,6 +78,75 @@ const ChatPage = () => {
     getMessagesData(token);
   }, [dispatch]);
 
+  useEffect(() => {
+    if (!isAuthorization) {
+      navigate('/login');
+    }
+  });
+
+  const notifyAddChannel = () => {
+    toast.success(t('channels.created'), {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+      transition: Bounce,
+    });
+  };
+
+  const notifyRenameChannel = () => {
+    toast.success(t('channels.renamed'), {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+      transition: Bounce,
+    });
+  };
+
+  const notifyDeleteChannel = () => {
+    toast.success(t('channels.removed'), {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+      transition: Bounce,
+    });
+  };
+
+  useEffect(() => {
+    if (isShowNotifyAddChannel) {
+      notifyAddChannel();
+      dispatch(setShowNotifyAddChannel());
+    }
+  }, [isShowNotifyAddChannel]);
+
+  useEffect(() => {
+    if (isShowNotifyRenameChannel) {
+      notifyRenameChannel();
+      dispatch(setShowNotifyRenameChannel());
+    }
+  }, [isShowNotifyRenameChannel]);
+
+  useEffect(() => {
+    if (isShowNotifyDeleteChannel) {
+      notifyDeleteChannel();
+      dispatch(setShowNotifyDeleteChannel());
+    }
+  }, [isShowNotifyDeleteChannel]);
+
   return (
     <div className="h-100">
       <div className="h-100" id="chat">
@@ -90,6 +176,9 @@ const ChatPage = () => {
           {isShowModalAddChannel && <ModalAddChannel />}
           {isShowModalRenameChannel && <ModalRenameChannel />}
           {isShowModalDeleteChannel && <ModalDeleteChannel />}
+        </div>
+        <div className="Toastify">
+          <ToastContainer />
         </div>
       </div>
     </div>

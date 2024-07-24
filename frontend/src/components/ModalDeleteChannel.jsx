@@ -9,6 +9,7 @@ import {
   getActiveChannelForDelete,
   setShowModalDeleteChannel,
   setDeleteChannel,
+  setShowNotifyDeleteChannel,
 } from '../slices/channelSlice.js';
 import { deleteMessagesDuringDeleteChannel } from '../slices/messageSlice';
 import routes from '../routes.js';
@@ -37,6 +38,7 @@ const ModalDeleteChannel = () => {
         dispatch(deleteMessagesDuringDeleteChannel({ id: response.data.id }));
         handleSetShowModalDeleteChannel();
         dispatch(setActiveChannel(1));
+        dispatch(setShowNotifyDeleteChannel());
       }
     } catch (e) {
       console.log(e);

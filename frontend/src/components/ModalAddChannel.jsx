@@ -9,7 +9,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import {
-  selectChannels, setActiveChannel, setShowModalAddChannel, addChannel,
+  selectChannels, setActiveChannel, setShowModalAddChannel, addChannel, setShowNotifyAddChannel,
 } from '../slices/channelSlice.js';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice.js';
@@ -33,9 +33,9 @@ const ModalAddChannel = () => {
         },
       });
       if (response.data) {
-        console.log('New channel data>>>', response.data);
         dispatch(addChannel(response.data));
         dispatch(setActiveChannel(response.data.id));
+        dispatch(setShowNotifyAddChannel());
         handleSetShowModalAddChannel();
       }
     } catch (e) {

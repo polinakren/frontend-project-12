@@ -7,7 +7,7 @@ import { useRef, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import * as Yup from "yup";
+import * as Yup from 'yup';
 
 import img from '../assets/avatar.jpg';
 import routes from '../routes';
@@ -36,6 +36,7 @@ const Login = () => {
       username: '',
       password: '',
     },
+    validationSchema: schema,
     onSubmit: async (values) => {
       setAuthFailed(false);
 

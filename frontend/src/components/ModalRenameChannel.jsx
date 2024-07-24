@@ -13,6 +13,7 @@ import {
   setShowModalRenameChannel,
   setNewChannelName,
   getActiveChannelForRename,
+  setShowNotifyRenameChannel,
 } from '../slices/channelSlice';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice';
@@ -41,6 +42,7 @@ const ModalRenameChannel = () => {
       if (response.data) {
         dispatch(setNewChannelName({ id: response.data.id, newName: response.data.name }));
         handleSetShowModalRenameChannel();
+        dispatch(setShowNotifyRenameChannel());
       }
     } catch (e) {
       console.log(e);
