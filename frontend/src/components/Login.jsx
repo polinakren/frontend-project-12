@@ -94,6 +94,7 @@ const Login = () => {
                         name="username"
                         autoComplete="username"
                         required
+                        autoFocus
                       />
                     </FloatingLabel>
                   </Form.Group>
@@ -120,7 +121,7 @@ const Login = () => {
               <div className="text-center">
                 <span>{t('login.newToChat')}</span>
                 {' '}
-                <NavLink to="404">{t('login.signup')}</NavLink>
+                <NavLink to="/signup">{t('login.signup')}</NavLink>
               </div>
             </Card.Footer>
           </Card>

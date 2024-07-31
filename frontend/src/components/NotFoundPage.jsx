@@ -11,7 +11,6 @@ const NotFound = () => {
       <h1 className="h4 text-muted">{t('notFound.header')}</h1>
       <p className="text-muted">
         {t('notFound.message')}
-        {' '}
         <a href="/">{t('notFound.linkText')}</a>
       </p>
     </div>
