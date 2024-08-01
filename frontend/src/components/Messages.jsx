@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Formik, Field, Form } from 'formik';
-import { Button } from 'react-bootstrap';
+import { Formik } from 'formik';
+import { Form, InputGroup, Button } from 'react-bootstrap';
 import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 import filter from 'leo-profanity';
 import axios from 'axios';
+import { ArrowRightSquare } from 'react-bootstrap-icons';
+import * as yup from 'yup';
 
 import { getMessages, addMessage, getCountOfMessages } from '../slices/messageSlice';
 import { getActiveChannelId, getActiveChannelName } from '../slices/channelSlice';
@@ -20,6 +22,7 @@ const Messages = () => {
   const token = useSelector(getToken);
   const user = useSelector(selectUser);
   const { t } = useTranslation();
+  const inputRef = useRef(null);
 
   const activeChannelName = useSelector(getActiveChannelName);
   const activeChannelId = useSelector(getActiveChannelId);
@@ -36,6 +39,10 @@ const Messages = () => {
     };
   }, [dispatch]);
 
+  useEffect(() => {
+    inputRef.current.focus();
+  }, []);
+
   const handleSubmitMessage = async (newMessage) => {
     const cleanedBody = filter.clean(newMessage.body);
     const useCleanMessage = {
@@ -49,12 +56,20 @@ const Messages = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      inputRef.current.focus();
     } catch (e) {
       console.log(e);
     }
   };
 
   const newMessageFunc = (value, channelId, username) => ({ body: value, channelId, username });
+
+  const validationSchema = yup.object().shape({
+    message: yup
+      .string()
+      .trim()
+      .required('Required'),
+  });
 
   return (
     <div className="col p-0 h-100">
@@ -68,6 +83,7 @@ const Messages = () => {
           </p>
           <span className="text-muted">
             {countOfMessages}
+            {' '}
             {t('chat.messageCount', { count: countOfMessages })}
           </span>
         </div>
@@ -77,7 +93,7 @@ const Messages = () => {
             .map((message) => (
               <div key={message.id} className="text-break mb-2">
                 <b key={message.channelId}>{message.username}</b>
-                :
+                {': '}
                 {message.body}
               </div>
             ))}
@@ -85,6 +101,7 @@ const Messages = () => {
         <div className="mt-auto px-5 py-3">
           <Formik
             initialValues={{ message: '' }}
+            validationSchema={validationSchema}
             onSubmit={(values, { resetForm }) => {
               const newMessage = newMessageFunc(
                 values.message,
@@ -97,25 +114,22 @@ const Messages = () => {
           >
             {({ handleChange, handleBlur, values }) => (
               <Form noValidate className="py-1 border rounded-2">
-                <div className="input-group has-validation">
-                  <Field
-                    type="text"
-                    name="message"
-                    aria-label={t('chat.newMessage')}
-                    autoComplete="off"
-                    placeholder={t('chat.inputMesage')}
-                    className="border-0 p-0 ps-2 form-control"
+                <InputGroup>
+                  <Form.Control
+                    ref={inputRef}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     value={values.message}
+                    name="message"
+                    aria-label={t('chat.newMessage')}
+                    placeholder={t('chat.inputMesage')}
+                    className="border-0 p-0 ps-2"
                   />
-                  <Button type="submit" disabled="" className="btn btn-group-vertical">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor">
-                      <path fillRule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z" />
-                    </svg>
+                  <Button variant="group-vertical" type="submit">
+                    <ArrowRightSquare size={20} />
                     <span className="visually-hidden">{t('chat.send')}</span>
                   </Button>
-                </div>
+                </InputGroup>
               </Form>
             )}
           </Formik>

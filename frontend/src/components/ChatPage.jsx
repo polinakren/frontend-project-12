@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import routes from '../routes';
 import Channels from './Channels.jsx';
 import Messages from './Messages.jsx';
-import { getToken, logoutUser, selectIsAuthenticated } from '../slices/authSlice.js';
+import { getToken, selectIsAuthenticated } from '../slices/authSlice.js';
 import {
   setChannels,
   getShowModalAddChannel,
@@ -40,10 +40,6 @@ const ChatPage = () => {
   const isShowNotifyAddChannel = useSelector(getShowNotifyAddChannel);
   const isShowNotifyRenameChannel = useSelector(getShowNotifyRenameChannel);
   const isShowNotifyDeleteChannel = useSelector(getShowNotifyDeleteChannel);
-
-  const handleLogOut = () => {
-    dispatch(logoutUser());
-  };
 
   const getChannelsData = async () => {
     try {
@@ -151,18 +147,6 @@ const ChatPage = () => {
     <div className="h-100">
       <div className="h-100" id="chat">
         <div className="d-flex flex-column h-100">
-          <nav className="shadow-sm navbar navbar-expand-lg navbar-light bg-white">
-            <div className="container">
-              <a className="navbar-brand" href="/">
-                {t('hexletChat')}
-              </a>
-              <button type="button" className="btn btn-primary" onClick={handleLogOut}>
-                <a href="/login">
-                  {t('logout')}
-                </a>
-              </button>
-            </div>
-          </nav>
           <div className="container h-100 my-4 overflow-hidden rounded shadow">
             <div className="row h-100 bg-white flex-md-row">
               <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
