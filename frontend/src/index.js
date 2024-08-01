@@ -10,11 +10,13 @@ import rollbarConfig from './rollbar';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Provider config={rollbarConfig}>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </Provider>,
+  <React.StrictMode>
+    <Provider config={rollbarConfig}>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </Provider>
+  </React.StrictMode>,
 );
 
 reportWebVitals();

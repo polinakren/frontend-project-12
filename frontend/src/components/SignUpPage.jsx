@@ -76,18 +76,18 @@ const SignUpPage = () => {
         <div className="row justify-content-center align-content-center h-100">
           <div className="col-12 col-md-6 col-xxl-6">
             <div className="card shadow-sm">
-              <div className="card-body row p-5">
+              <div className="card-body d-flex flex-column flex-md-row justify-content-around align-items-center p-5">
                 <div>
                   <img src={signUpImage} className="rounded-circle" alt={t('signup.header')} />
                 </div>
                 <div className="col-12 col-md-6">
                   <Form onSubmit={formInit.handleSubmit}>
                     <h1 className="text-center mb-4">{t('signup.header')}</h1>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="form-floating mb-3">
                       <Form.Control
                         name="username"
                         type="text"
-                        placeholder={t('login.username')}
+                        placeholder={t('signup.username')}
                         autoComplete="username"
                         id="username"
                         onChange={formInit.handleChange}
@@ -95,11 +95,12 @@ const SignUpPage = () => {
                         value={formInit.values.username}
                         isInvalid={formInit.touched.username && (!!formInit.errors.username)}
                       />
+                      <Form.Label htmlFor="username">{t('signup.username')}</Form.Label>
                       <Form.Control.Feedback type="invalid">
                         {formInit.errors.username}
                       </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group className="mb-3">
+                    <Form.Group className=" form-floating mb-3">
                       <Form.Control
                         name="password"
                         type="password"
@@ -111,11 +112,12 @@ const SignUpPage = () => {
                         value={formInit.values.password}
                         isInvalid={formInit.touched.password && (!!formInit.errors.password)}
                       />
+                      <Form.Label htmlFor="password">{t('signup.password')}</Form.Label>
                       <Form.Control.Feedback type="invalid">
                         {formInit.errors.password}
                       </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="form-floating mb-3">
                       <Form.Control
                         name="confirmPassword"
                         type="password"
@@ -128,11 +130,12 @@ const SignUpPage = () => {
                         isInvalid={formInit.touched.confirmPassword
                           && (!!formInit.errors.confirmPassword)}
                       />
+                      <Form.Label htmlFor="confirmPassword">{t('signup.confirm')}</Form.Label>
                       <Form.Control.Feedback type="invalid">
                         {formInit.errors.confirmPassword}
                       </Form.Control.Feedback>
                     </Form.Group>
-                    <Button type="submit">
+                    <Button type="submit" className="w-100" variant="outline-primary">
                       {t('signup.submit')}
                     </Button>
                     {nameError && (
