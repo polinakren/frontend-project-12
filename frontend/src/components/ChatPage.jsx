@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { toast, Bounce, ToastContainer } from 'react-toastify';
+import { toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import routes from '../routes';
@@ -33,46 +33,50 @@ const ChatPage = () => {
   const { t } = useTranslation();
 
   const token = localStorage.getItem('token');
+  const isAuthorization = useSelector(getIsAuthorization);
+
   const isShowModalAddChannel = useSelector(getShowModalAddChannel);
   const isShowModalRenameChannel = useSelector(getShowModalRenameChannel);
   const isShowModalDeleteChannel = useSelector(getShowModalDeleteChannel);
-  const isAuthorization = useSelector(getIsAuthorization);
   const isShowNotifyAddChannel = useSelector(getShowNotifyAddChannel);
   const isShowNotifyRenameChannel = useSelector(getShowNotifyRenameChannel);
   const isShowNotifyDeleteChannel = useSelector(getShowNotifyDeleteChannel);
 
-  const getChannelsData = async () => {
-    try {
-      const response = await axios.get(routes.channelsPath(), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const channelsData = response.data;
-      dispatch(setChannels(channelsData));
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  useEffect(() => {
+    const getChannelsData = async (userToken) => {
+      try {
+        const responseChannels = await axios.get(routes.channelsPath(), {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        });
+        const channelsData = responseChannels.data;
+        dispatch(setChannels(channelsData));
+      } catch (e) {
+        console.log(e);
+      }
+    };
 
-  const getMessagesData = async () => {
-    try {
-      const responseMessages = await axios.get(routes.messagesPath(), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const messagesData = responseMessages.data;
-      dispatch(loadMessages(messagesData));
-    } catch (e) {
-      console.log(e);
-    }
-  };
+    getChannelsData(token);
+  }, [token, dispatch]);
 
   useEffect(() => {
-    getChannelsData(token);
+    const getMessagesData = async (userToken) => {
+      try {
+        const responseMessages = await axios.get(routes.messagesPath(), {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        });
+        const messagesData = responseMessages.data;
+        dispatch(loadMessages(messagesData));
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
     getMessagesData(token);
-  }, [dispatch, token]);
+  }, [token, dispatch]);
 
   useEffect(() => {
     if (!isAuthorization) {
@@ -160,9 +164,6 @@ const ChatPage = () => {
           {isShowModalAddChannel && <ModalAddChannel />}
           {isShowModalRenameChannel && <ModalRenameChannel />}
           {isShowModalDeleteChannel && <ModalDeleteChannel />}
-        </div>
-        <div className="Toastify">
-          <ToastContainer />
         </div>
       </div>
     </div>

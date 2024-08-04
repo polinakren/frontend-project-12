@@ -7,7 +7,6 @@ import {
 } from 'formik';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import filter from 'leo-profanity';
 import { io } from 'socket.io-client';
 
 import {
@@ -19,11 +18,11 @@ import {
 } from '../slices/channelSlice';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice';
+import cleanText from '../profanity';
 
 const socket = io();
 
 const ModalRenameChannel = () => {
-  filter.loadDictionary('ru');
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -36,7 +35,7 @@ const ModalRenameChannel = () => {
   };
 
   const handleSetNewChannelName = async (newName, userToken, changingChannelId) => {
-    const cleanNameChannel = filter.clean(newName);
+    const cleanNameChannel = cleanText(newName);
     const editedChannel = { name: cleanNameChannel };
 
     const pathToRenameChannel = [routes.channelsPath(), changingChannelId].join('/');

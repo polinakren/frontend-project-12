@@ -4,7 +4,6 @@ import { Formik } from 'formik';
 import { Form, InputGroup, Button } from 'react-bootstrap';
 import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
-import filter from 'leo-profanity';
 import axios from 'axios';
 import { ArrowRightSquare } from 'react-bootstrap-icons';
 import * as yup from 'yup';
@@ -13,16 +12,17 @@ import { getMessages, addMessage, getCountOfMessages } from '../slices/messageSl
 import { getActiveChannelId, getActiveChannelName } from '../slices/channelSlice';
 import routes from '../routes';
 import { getToken, selectUser } from '../slices/authSlice';
+import cleanText from '../profanity';
 
 const socket = io();
 
 const Messages = () => {
-  filter.loadDictionary('ru');
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
   const token = useSelector(getToken);
   const user = useSelector(selectUser);
+  console.log(user);
 
   const inputRef = useRef(null);
 
@@ -43,17 +43,12 @@ const Messages = () => {
 
   useEffect(() => {
     inputRef.current.focus();
-  }, []);
+  }, [activeChannelName]);
 
   const handleSubmitMessage = async (newMessage) => {
-    const cleanedBody = filter.clean(newMessage.body);
-    const useCleanMessage = {
-      ...newMessage,
-      body: cleanedBody,
-    };
-
+    console.log('newMessage', newMessage);
     try {
-      await axios.post(routes.messagesPath(), useCleanMessage, {
+      await axios.post(routes.messagesPath(), newMessage, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -64,7 +59,9 @@ const Messages = () => {
     }
   };
 
-  const newMessageFunc = (value, channelId, username) => ({ body: value, channelId, username });
+  const newMessageFunc = (value, channelId, username) => (
+    { body: cleanText(value), channelId, username }
+  );
 
   const validationSchema = yup.object().shape({
     message: yup
@@ -79,8 +76,7 @@ const Messages = () => {
         <div className="bg-light mb-4 p-3 shadow-sm small">
           <p className="m-0">
             <b>
-              #
-              {activeChannelName}
+              {`# ${activeChannelName}`}
             </b>
           </p>
           <span className="text-muted">
@@ -114,8 +110,10 @@ const Messages = () => {
               resetForm();
             }}
           >
-            {({ handleChange, handleBlur, values }) => (
-              <Form noValidate className="py-1 border rounded-2">
+            {({
+              handleChange, handleBlur, values, handleSubmit, isSubmitting,
+            }) => (
+              <Form onSubmit={handleSubmit} noValidate className="py-1 border rounded-2">
                 <InputGroup>
                   <Form.Control
                     ref={inputRef}
@@ -127,7 +125,7 @@ const Messages = () => {
                     placeholder={t('chat.inputMesage')}
                     className="border-0 p-0 ps-2"
                   />
-                  <Button variant="group-vertical" type="submit">
+                  <Button disabled={values.message === '' || isSubmitting} variant="group-vertical" type="submit">
                     <ArrowRightSquare size={20} />
                     <span className="visually-hidden">{t('chat.send')}</span>
                   </Button>

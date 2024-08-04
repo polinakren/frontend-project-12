@@ -7,7 +7,6 @@ import {
   Formik, Field, Form, ErrorMessage,
 } from 'formik';
 import { useTranslation } from 'react-i18next';
-import filter from 'leo-profanity';
 import { io } from 'socket.io-client';
 
 import {
@@ -15,11 +14,11 @@ import {
 } from '../slices/channelSlice.js';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice.js';
+import cleanText from '../profanity';
 
 const socket = io();
 
 const ModalAddChannel = () => {
-  filter.loadDictionary('ru');
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -52,7 +51,7 @@ const ModalAddChannel = () => {
   };
 
   const handleAddChannel = async (name) => {
-    const cleanedChannelName = filter.clean(name);
+    const cleanedChannelName = cleanText(name);
     const newChannel = { name: cleanedChannelName };
     try {
       const response = await axios.post(routes.channelsPath(), newChannel, {
@@ -61,7 +60,7 @@ const ModalAddChannel = () => {
         },
       });
       if (response.data) {
-        dispatch(addChannel(response.data));
+        // dispatch(addChannel(response.data));
         dispatch(setActiveChannel(response.data.id));
         dispatch(setShowNotifyAddChannel());
         handleSetShowModalAddChannel();

@@ -41,13 +41,11 @@ const SignUpPage = () => {
       });
 
       if (response.data) {
-        const tokenData = response.data.token;
+        const { token, username } = response.data;
         if (localStorage.getItem('token')) {
-          localStorage.removeItem('token');
           dispatch(logoutUser());
         }
-        localStorage.setItem('token', tokenData);
-        dispatch(loginUser(response.data.username));
+        dispatch(loginUser({ token, username }));
         setShowNameError(false);
         navigate('/');
       } else {
