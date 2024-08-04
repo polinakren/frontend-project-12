@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
@@ -8,12 +8,15 @@ import {
 } from 'formik';
 import { useTranslation } from 'react-i18next';
 import filter from 'leo-profanity';
+import { io } from 'socket.io-client';
 
 import {
-  selectChannels, setActiveChannel, setShowModalAddChannel, addChannel, setShowNotifyAddChannel,
+  getChannels, setActiveChannel, setShowModalAddChannel, addChannel, setShowNotifyAddChannel,
 } from '../slices/channelSlice.js';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice.js';
+
+const socket = io();
 
 const ModalAddChannel = () => {
   filter.loadDictionary('ru');
@@ -21,6 +24,28 @@ const ModalAddChannel = () => {
   const { t } = useTranslation();
 
   const token = useSelector(getToken);
+
+  const channels = useSelector(getChannels);
+
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    socket.on('newChannel', (currentNewChannel) => {
+      console.log('Current newChannel>>>', currentNewChannel);
+      dispatch(addChannel(currentNewChannel));
+    });
+    return () => {
+      socket.off('newChannel');
+    };
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 100);
+  }, []);
 
   const handleSetShowModalAddChannel = () => {
     dispatch(setShowModalAddChannel());
@@ -46,7 +71,6 @@ const ModalAddChannel = () => {
     }
   };
 
-  const channels = useSelector(selectChannels);
   const isUniqueChannelName = (name) => {
     const checkChannels = channels.filter((channel) => channel.name === name);
     return checkChannels.length <= 0;

@@ -14,14 +14,16 @@ import { getActiveChannelId, getActiveChannelName } from '../slices/channelSlice
 import routes from '../routes';
 import { getToken, selectUser } from '../slices/authSlice';
 
-const socket = io('http://localhost:3000');
+const socket = io();
 
 const Messages = () => {
   filter.loadDictionary('ru');
   const dispatch = useDispatch();
+  const { t } = useTranslation();
+
   const token = useSelector(getToken);
   const user = useSelector(selectUser);
-  const { t } = useTranslation();
+
   const inputRef = useRef(null);
 
   const activeChannelName = useSelector(getActiveChannelName);

@@ -8,9 +8,10 @@ import {
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import filter from 'leo-profanity';
+import { io } from 'socket.io-client';
 
 import {
-  selectChannels,
+  getChannels,
   setShowModalRenameChannel,
   setNewChannelName,
   getActiveChannelForRename,
@@ -18,6 +19,8 @@ import {
 } from '../slices/channelSlice';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice';
+
+const socket = io();
 
 const ModalRenameChannel = () => {
   filter.loadDictionary('ru');
@@ -54,6 +57,15 @@ const ModalRenameChannel = () => {
   };
 
   useEffect(() => {
+    socket.on('renameChannel', (currentRenameChannel) => {
+      dispatch(setNewChannelName({ id: currentRenameChannel.id, name: currentRenameChannel.name }));
+    });
+    return () => {
+      socket.off('renameChannel');
+    };
+  }, []);
+
+  useEffect(() => {
     setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus();
@@ -62,7 +74,7 @@ const ModalRenameChannel = () => {
     }, 100);
   }, []);
 
-  const channels = useSelector(selectChannels);
+  const channels = useSelector(getChannels);
   const activeChannelForRename = useSelector(getActiveChannelForRename);
 
   const isUniqueChannelName = (name) => {

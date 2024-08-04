@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { logoutUser, selectIsAuthenticated } from '../slices/authSlice';
+import { logoutUser, getIsAuthorization } from '../slices/authSlice';
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const isAuthorization = useSelector(selectIsAuthenticated);
+  const isAuthorization = useSelector(getIsAuthorization);
   const { t } = useTranslation();
 
   const logOut = () => dispatch(logoutUser());

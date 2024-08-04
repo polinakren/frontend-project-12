@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { io } from 'socket.io-client';
 
 import {
   setActiveChannel,
@@ -14,6 +15,8 @@ import {
 import { deleteMessagesDuringDeleteChannel } from '../slices/messageSlice';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice';
+
+const socket = io();
 
 const ModalDeleteChannel = () => {
   const dispatch = useDispatch();
@@ -45,6 +48,15 @@ const ModalDeleteChannel = () => {
     }
   };
   const activeChannelForDelete = useSelector(getActiveChannelForDelete);
+
+  useEffect(() => {
+    socket.on('removeChannel', (currentRemoveChannel) => {
+      dispatch(setDeleteChannel(currentRemoveChannel));
+    });
+    return () => {
+      socket.off('removeChannel');
+    };
+  }, []);
 
   return (
     <Modal show onHide={handleSetShowModalDeleteChannel} centered>

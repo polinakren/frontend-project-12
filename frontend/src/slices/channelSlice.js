@@ -2,9 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   channels: [],
-  activeChannel: {
-    id: 1,
-  },
+  activeChannelId: 1,
   showModalAddChannel: false,
   showModalRenameChannel: false,
   showModalDeleteChannel: false,
@@ -20,7 +18,7 @@ const initialState = {
   },
 };
 
-const channelSlice = createSlice({
+const channelsSlice = createSlice({
   name: 'channels',
   initialState,
   reducers: {
@@ -28,7 +26,7 @@ const channelSlice = createSlice({
       state.channels = action.payload;
     },
     setActiveChannel(state, action) {
-      state.activeChannel = { id: action.payload };
+      state.activeChannelId = action.payload;
     },
     addChannel(state, action) {
       state.channels = [...state.channels, action.payload];
@@ -43,10 +41,10 @@ const channelSlice = createSlice({
       state.showModalDeleteChannel = !state.showModalDeleteChannel;
     },
     setNewChannelName(state, action) {
-      const { id, newName } = action.payload;
+      const { id, name } = action.payload;
       state.channels.forEach((channel) => {
-        if (channel.id === id) {
-          channel.name = newName;
+        if (Number(channel.id) === Number(id)) {
+          channel.name = name;
         }
       });
     },
@@ -57,7 +55,7 @@ const channelSlice = createSlice({
     },
     setDeleteChannel(state, action) {
       const { id } = action.payload;
-      state.channels = state.channels.filter((channel) => channel.id !== id);
+      state.channels = state.channels.filter((channel) => Number(channel.id) !== Number(id));
     },
     setChannelDataForDelete(state, action) {
       const { channelId } = action.payload;
@@ -89,21 +87,17 @@ export const {
   setShowNotifyAddChannel,
   setShowNotifyRenameChannel,
   setShowNotifyDeleteChannel,
-} = channelSlice.actions;
-export const selectChannels = (state) => state.channels.channels;
+} = channelsSlice.actions;
+export const getChannels = (state) => state.channels.channels;
+export const getActiveChannelId = (state) => state.channels.activeChannelId;
 export const getActiveChannelName = (state) => {
-  const activeChannelId = state.channels.activeChannel.id;
-  const activeChannel = state.channels.channels.find((channel) => channel.id === activeChannelId);
-
+  const isActive = (element) => {
+    const currentActiveId = getActiveChannelId(state);
+    return Number(element.id) === Number(currentActiveId);
+  };
+  const activeChannel = state.channels.channels.find(isActive);
   return activeChannel ? activeChannel.name : null;
 };
-
-export const getActiveChannelId = (state) => {
-  const activeChannelId = state.channels.activeChannel.id;
-  const activeChannel = state.channels.channels.find((channel) => channel.id === activeChannelId);
-  return activeChannel ? activeChannel.id : null;
-};
-
 export const getShowModalAddChannel = (state) => state.channels.showModalAddChannel;
 export const getShowModalRenameChannel = (state) => state.channels.showModalRenameChannel;
 export const getShowModalDeleteChannel = (state) => state.channels.showModalDeleteChannel;
@@ -113,4 +107,4 @@ export const getShowNotifyAddChannel = (state) => state.channels.showNotifyAddCh
 export const getShowNotifyRenameChannel = (state) => state.channels.showNotifyRenameChannel;
 export const getShowNotifyDeleteChannel = (state) => state.channels.showNotifyDeleteChannel;
 
-export default channelSlice.reducer;
+export default channelsSlice.reducer;

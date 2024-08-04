@@ -2,19 +2,19 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   messages: [],
-  messageCount: 0,
+  amountOfMessages: 0,
 };
 
-const messageSlice = createSlice({
+const messagesSlice = createSlice({
   name: 'messages',
   initialState,
   reducers: {
-    addMessage(state, action) {
-      state.messages.push(action.payload);
-      state.messageCount += 1;
-    },
     loadMessages(state, action) {
       state.messages = action.payload;
+    },
+    addMessage(state, action) {
+      state.messages.push(action.payload);
+      state.amountOfMessages = state.messages.length;
     },
     deleteMessagesDuringDeleteChannel(state, action) {
       const { id } = action.payload;
@@ -23,18 +23,13 @@ const messageSlice = createSlice({
   },
 });
 
-export const { loadMessages, addMessage, deleteMessagesDuringDeleteChannel } = messageSlice.actions;
+export const {
+  loadMessages, addMessage, deleteMessagesDuringDeleteChannel, setInTheProcessSending,
+} = messagesSlice.actions;
 export const getMessages = (state) => state.messages.messages;
-export const getMessageCount = (state, activeChannelId) => {
-  const messages = state.messages.messages
-    .filter((message) => message.channelId === activeChannelId);
-  return messages.length;
-};
-
 export const getCountOfMessages = (state, activeChannelId) => {
   const messagesOfActiveChannel = state.messages.messages
-    .filter((message) => message.channelId === activeChannelId);
+    .filter((message) => Number(message.channelId) === Number(activeChannelId));
   return messagesOfActiveChannel.length;
 };
-
-export default messageSlice.reducer;
+export default messagesSlice.reducer;

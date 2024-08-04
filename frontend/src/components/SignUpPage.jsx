@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import routes from '../routes.js';
 import signUpImage from '../assets/signup-image.jpg';
-import { setToken, loginUser, logoutUser } from '../slices/authSlice';
+import { loginUser, logoutUser } from '../slices/authSlice';
 
 const SignUpPage = () => {
   const { t } = useTranslation();
@@ -47,7 +47,6 @@ const SignUpPage = () => {
           dispatch(logoutUser());
         }
         localStorage.setItem('token', tokenData);
-        dispatch(setToken(tokenData));
         dispatch(loginUser(response.data.username));
         setShowNameError(false);
         navigate('/');

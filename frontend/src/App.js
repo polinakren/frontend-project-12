@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
 
 import routes from './routes';
 import NotFoundPage from './components/NotFoundPage';
@@ -21,6 +22,7 @@ const App = () => (
           <Route path={routes.chatPagePath()} element={<ChatPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        <ToastContainer />
       </BrowserRouter>
     </Provider>
   </div>

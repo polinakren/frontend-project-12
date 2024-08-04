@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 
 import img from '../assets/avatar.jpg';
 import routes from '../routes';
-import { setToken, setUser } from '../slices/authSlice.js';
+import { loginUser } from '../slices/authSlice.js';
 
 const Login = () => {
   const inputRef = useRef();
@@ -45,18 +45,14 @@ const Login = () => {
           username: values.username,
           password: values.password,
         });
-
-        const { token } = response.data;
-        dispatch(setToken(token));
-        dispatch(setUser(values.username));
-        localStorage.setItem('token', token);
-
-        const getTokenInLocalStorage = localStorage.getItem('token');
-        if (getTokenInLocalStorage && getTokenInLocalStorage.length > 0) {
-          setAuthFailed(false);
-          navigate('/');
+        if (response.data) {
+          const { token, username } = response.data;
+          dispatch(loginUser({ token, username }));
+          const tokenValueInStorage = localStorage.getItem('token');
+          if (tokenValueInStorage && tokenValueInStorage.length > 0) {
+            navigate('/');
+          }
         } else {
-          setAuthFailed(true);
           navigate('/login');
         }
       } catch (e) {

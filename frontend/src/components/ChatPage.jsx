@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import routes from '../routes';
 import Channels from './Channels.jsx';
 import Messages from './Messages.jsx';
-import { getToken, selectIsAuthenticated } from '../slices/authSlice.js';
+import { getIsAuthorization } from '../slices/authSlice.js';
 import {
   setChannels,
   getShowModalAddChannel,
@@ -32,11 +32,11 @@ const ChatPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const token = useSelector(getToken);
+  const token = localStorage.getItem('token');
   const isShowModalAddChannel = useSelector(getShowModalAddChannel);
   const isShowModalRenameChannel = useSelector(getShowModalRenameChannel);
   const isShowModalDeleteChannel = useSelector(getShowModalDeleteChannel);
-  const isAuthorization = useSelector(selectIsAuthenticated);
+  const isAuthorization = useSelector(getIsAuthorization);
   const isShowNotifyAddChannel = useSelector(getShowNotifyAddChannel);
   const isShowNotifyRenameChannel = useSelector(getShowNotifyRenameChannel);
   const isShowNotifyDeleteChannel = useSelector(getShowNotifyDeleteChannel);
@@ -72,7 +72,7 @@ const ChatPage = () => {
   useEffect(() => {
     getChannelsData(token);
     getMessagesData(token);
-  }, [dispatch]);
+  }, [dispatch, token]);
 
   useEffect(() => {
     if (!isAuthorization) {
