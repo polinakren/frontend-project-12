@@ -1,22 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { io } from 'socket.io-client';
+import { toast } from 'react-toastify';
 
 import {
   setActiveChannel,
-  getActiveChannelForDelete,
   setShowModalDeleteChannel,
-  setDeleteChannel,
-  setShowNotifyDeleteChannel,
+  getActiveChannelForRename,
 } from '../slices/channelSlice.js';
 import { deleteMessagesDuringDeleteChannel } from '../slices/messageSlice';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice';
-
-const socket = io();
 
 const ModalDeleteChannel = () => {
   const dispatch = useDispatch();
@@ -28,6 +24,8 @@ const ModalDeleteChannel = () => {
     dispatch(setShowModalDeleteChannel());
   };
 
+  const activeChannelForDelete = useSelector(getActiveChannelForRename);
+
   const handleSetDeleteChannel = async (userToken, deletedChannelId) => {
     const pathToDeleteChannel = [routes.channelsPath(), deletedChannelId].join('/');
     try {
@@ -37,26 +35,15 @@ const ModalDeleteChannel = () => {
         },
       });
       if (response.data) {
-        dispatch(setDeleteChannel({ id: response.data.id }));
         dispatch(deleteMessagesDuringDeleteChannel({ id: response.data.id }));
         handleSetShowModalDeleteChannel();
         dispatch(setActiveChannel(1));
-        dispatch(setShowNotifyDeleteChannel());
+        toast.success(t('channels.removed'));
       }
     } catch (e) {
       console.log(e);
     }
   };
-  const activeChannelForDelete = useSelector(getActiveChannelForDelete);
-
-  useEffect(() => {
-    socket.on('removeChannel', (currentRemoveChannel) => {
-      dispatch(setDeleteChannel(currentRemoveChannel));
-    });
-    return () => {
-      socket.off('removeChannel');
-    };
-  }, []);
 
   return (
     <Modal show onHide={handleSetShowModalDeleteChannel} centered>

@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import routes from '../routes';
@@ -15,12 +13,6 @@ import {
   getShowModalAddChannel,
   getShowModalRenameChannel,
   getShowModalDeleteChannel,
-  getShowNotifyAddChannel,
-  getShowNotifyRenameChannel,
-  getShowNotifyDeleteChannel,
-  setShowNotifyAddChannel,
-  setShowNotifyRenameChannel,
-  setShowNotifyDeleteChannel,
 } from '../slices/channelSlice.js';
 import { loadMessages } from '../slices/messageSlice';
 import ModalAddChannel from './ModalAddChannel.jsx';
@@ -30,7 +22,6 @@ import ModalDeleteChannel from './ModalDeleteChannel.jsx';
 const ChatPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { t } = useTranslation();
 
   const token = localStorage.getItem('token');
   const isAuthorization = useSelector(getIsAuthorization);
@@ -38,9 +29,6 @@ const ChatPage = () => {
   const isShowModalAddChannel = useSelector(getShowModalAddChannel);
   const isShowModalRenameChannel = useSelector(getShowModalRenameChannel);
   const isShowModalDeleteChannel = useSelector(getShowModalDeleteChannel);
-  const isShowNotifyAddChannel = useSelector(getShowNotifyAddChannel);
-  const isShowNotifyRenameChannel = useSelector(getShowNotifyRenameChannel);
-  const isShowNotifyDeleteChannel = useSelector(getShowNotifyDeleteChannel);
 
   useEffect(() => {
     const getChannelsData = async (userToken) => {
@@ -80,72 +68,9 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (!isAuthorization) {
-      navigate('/login');
+      navigate(routes.loginPagePath());
     }
   });
-
-  const notifyAddChannel = () => {
-    toast.success(t('channels.created'), {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'light',
-      transition: Bounce,
-    });
-  };
-
-  const notifyRenameChannel = () => {
-    toast.success(t('channels.renamed'), {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'light',
-      transition: Bounce,
-    });
-  };
-
-  const notifyDeleteChannel = () => {
-    toast.success(t('channels.removed'), {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'light',
-      transition: Bounce,
-    });
-  };
-
-  useEffect(() => {
-    if (isShowNotifyAddChannel) {
-      notifyAddChannel();
-      dispatch(setShowNotifyAddChannel());
-    }
-  }, [isShowNotifyAddChannel]);
-
-  useEffect(() => {
-    if (isShowNotifyRenameChannel) {
-      notifyRenameChannel();
-      dispatch(setShowNotifyRenameChannel());
-    }
-  }, [isShowNotifyRenameChannel]);
-
-  useEffect(() => {
-    if (isShowNotifyDeleteChannel) {
-      notifyDeleteChannel();
-      dispatch(setShowNotifyDeleteChannel());
-    }
-  }, [isShowNotifyDeleteChannel]);
 
   return (
     <div className="h-100">

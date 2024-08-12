@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { logoutUser, getIsAuthorization } from '../slices/authSlice';
+import routes from '../routes';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -16,7 +17,7 @@ const Navbar = () => {
   return (
     <BootstrapNavbar bg="white" expand="lg" className="shadow-sm">
       <div className="container">
-        <BootstrapNavbar.Brand as={Link} to="/">{t('hexletChat')}</BootstrapNavbar.Brand>
+        <BootstrapNavbar.Brand as={Link} to={routes.chatPagePath()}>{t('hexletChat')}</BootstrapNavbar.Brand>
         {isAuthorization && <Button onClick={logOut}>{t('logout')}</Button>}
       </div>
     </BootstrapNavbar>

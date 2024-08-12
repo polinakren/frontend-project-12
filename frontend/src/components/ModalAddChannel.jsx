@@ -1,26 +1,23 @@
 import React, { useEffect, useRef } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import * as yup from 'yup';
-import {
-  Formik, Field, Form, ErrorMessage,
-} from 'formik';
+import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { io } from 'socket.io-client';
+import { toast } from 'react-toastify';
 
 import {
-  getChannels, setActiveChannel, setShowModalAddChannel, addChannel, setShowNotifyAddChannel,
+  getChannels, setActiveChannel, setShowModalAddChannel,
 } from '../slices/channelSlice.js';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice.js';
-import cleanText from '../profanity';
-
-const socket = io();
+import { useProfanity } from '../hooks';
 
 const ModalAddChannel = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const profanity = useProfanity();
 
   const token = useSelector(getToken);
 
@@ -29,29 +26,17 @@ const ModalAddChannel = () => {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    socket.on('newChannel', (currentNewChannel) => {
-      console.log('Current newChannel>>>', currentNewChannel);
-      dispatch(addChannel(currentNewChannel));
-    });
-    return () => {
-      socket.off('newChannel');
-    };
-  }, []);
-
-  useEffect(() => {
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 100);
+    inputRef.current.focus();
   }, []);
 
   const handleSetShowModalAddChannel = () => {
     dispatch(setShowModalAddChannel());
   };
 
+  const getFilteredChannelName = (message) => profanity(message).trim();
+
   const handleAddChannel = async (name) => {
-    const cleanedChannelName = cleanText(name);
+    const cleanedChannelName = getFilteredChannelName(name);
     const newChannel = { name: cleanedChannelName };
     try {
       const response = await axios.post(routes.channelsPath(), newChannel, {
@@ -60,9 +45,8 @@ const ModalAddChannel = () => {
         },
       });
       if (response.data) {
-        // dispatch(addChannel(response.data));
         dispatch(setActiveChannel(response.data.id));
-        dispatch(setShowNotifyAddChannel());
+        toast.success(t('channels.created'));
         handleSetShowModalAddChannel();
       }
     } catch (e) {
@@ -72,11 +56,11 @@ const ModalAddChannel = () => {
 
   const isUniqueChannelName = (name) => {
     const checkChannels = channels.filter((channel) => channel.name === name);
-    return checkChannels.length <= 0;
+    return !(checkChannels.length > 0);
   };
 
   const schema = yup.object().shape({
-    newChannelName: yup.string()
+    name: yup.string()
       .required(t('validation.required'))
       .min(3, t('validation.min'))
       .max(20, t('validation.max'))
@@ -90,30 +74,32 @@ const ModalAddChannel = () => {
       </Modal.Header>
       <Modal.Body>
         <Formik
-          initialValues={{ newChannelName: '' }}
+          initialValues={{ name: '' }}
           validationSchema={schema}
           onSubmit={(values) => {
-            handleAddChannel(values.newChannelName, token);
+            handleAddChannel(values.name, token);
           }}
         >
-          {({ handleChange, handleBlur, values }) => (
-            <Form noValidate className="mb-2">
-              <Field
-                type="text"
-                name="newChannelName"
-                aria-label={t('channels.channelName')}
-                autoComplete="off"
-                placeholder=""
-                className="form-control"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.newChannelName}
-              />
-              <ErrorMessage
-                component="div"
-                name="newChannelName"
-                className="text-danger"
-              />
+          {({
+            handleChange, handleBlur, handleSubmit, values, touched, errors,
+          }) => (
+            <Form onSubmit={handleSubmit} className="mb-2">
+              <Form.Group>
+                <Form.Label visuallyHidden>{t('channels.channelName')}</Form.Label>
+                <Form.Control
+                  name="name"
+                  id="name"
+                  className="mb-2"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.name}
+                  ref={inputRef}
+                  isInvalid={touched.name && (!!errors.name)}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.name}
+                </Form.Control.Feedback>
+              </Form.Group>
               <Modal.Footer>
                 <Button variant="secondary" onClick={handleSetShowModalAddChannel}>
                   {t('modals.cancel')}

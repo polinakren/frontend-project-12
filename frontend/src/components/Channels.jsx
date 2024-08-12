@@ -12,7 +12,6 @@ import {
   setShowModalRenameChannel,
   setChannelDataForRename,
   setShowModalDeleteChannel,
-  setChannelDataForDelete,
 } from '../slices/channelSlice';
 
 const Channels = () => {
@@ -20,7 +19,6 @@ const Channels = () => {
   const { t } = useTranslation();
 
   const channels = useSelector(getChannels);
-  console.log(channels);
   const activeChannelId = useSelector(getActiveChannelId);
 
   const handleSetActiveChannel = (id) => {
@@ -37,7 +35,7 @@ const Channels = () => {
   };
 
   const handleSetChannelDataForDelete = (channelId) => {
-    dispatch(setChannelDataForDelete({ channelId }));
+    dispatch(setChannelDataForRename({ channelId }));
     dispatch(setShowModalDeleteChannel());
   };
 
@@ -82,7 +80,7 @@ const Channels = () => {
                       <span className="visually-hidden">{t('channels.menu')}</span>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                      <Dropdown.Item eventKey="1" onClick={() => handleSetChannelDataForDelete(channel.id)}>{t('channels.delete')}</Dropdown.Item>
+                      <Dropdown.Item eventKey="1" onClick={() => handleSetChannelDataForDelete(channel.id)}>{t('channels.remove')}</Dropdown.Item>
                       <Dropdown.Item eventKey="2" onClick={() => handleSetChannelDataForRename(channel.id, channel.name)}>{t('channels.rename')}</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>

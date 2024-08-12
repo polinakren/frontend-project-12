@@ -47,10 +47,10 @@ const SignUpPage = () => {
         }
         dispatch(loginUser({ token, username }));
         setShowNameError(false);
-        navigate('/');
+        navigate(routes.chatPagePath());
       } else {
         setShowNameError(true);
-        navigate('/signup');
+        navigate(routes.signUpPath());
       }
     } catch (e) {
       console.log(e);
@@ -67,6 +67,7 @@ const SignUpPage = () => {
     validationSchema: schema,
     onSubmit: (values) => handleSubmit(values),
   });
+
   return (
     <div className="d-flex flex-column h-100">
       <div className="container-fluid h-100">

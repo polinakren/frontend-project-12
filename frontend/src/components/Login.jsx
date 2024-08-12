@@ -50,10 +50,10 @@ const Login = () => {
           dispatch(loginUser({ token, username }));
           const tokenValueInStorage = localStorage.getItem('token');
           if (tokenValueInStorage && tokenValueInStorage.length > 0) {
-            navigate('/');
+            navigate(routes.chatPagePath());
           }
         } else {
-          navigate('/login');
+          navigate(routes.loginPagePath());
         }
       } catch (e) {
         console.log(e);
@@ -84,6 +84,7 @@ const Login = () => {
                         type="text"
                         ref={inputRef}
                         onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         value={formik.values.username}
                         isInvalid={authFailed}
                         placeholder={t('login.username')}
@@ -99,11 +100,12 @@ const Login = () => {
                       <Form.Control
                         type="password"
                         onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         value={formik.values.password}
                         isInvalid={authFailed}
                         placeholder={t('login.password')}
                         name="password"
-                        autoComplete="current-password"
+                        autoComplete="password"
                         required
                       />
                     </FloatingLabel>

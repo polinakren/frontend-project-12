@@ -1,30 +1,26 @@
 import React, { useEffect, useRef } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import * as yup from 'yup';
-import {
-  Formik, Field, Form, ErrorMessage,
-} from 'formik';
+import { Formik } from 'formik';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { io } from 'socket.io-client';
+import { toast } from 'react-toastify';
 
 import {
   getChannels,
   setShowModalRenameChannel,
-  setNewChannelName,
   getActiveChannelForRename,
-  setShowNotifyRenameChannel,
 } from '../slices/channelSlice';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice';
-import cleanText from '../profanity';
-
-const socket = io();
+import { useProfanity } from '../hooks';
 
 const ModalRenameChannel = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const profanity = useProfanity();
+  const getFilteredChannelName = (message) => profanity(message).trim();
 
   const token = useSelector(getToken);
 
@@ -35,7 +31,7 @@ const ModalRenameChannel = () => {
   };
 
   const handleSetNewChannelName = async (newName, userToken, changingChannelId) => {
-    const cleanNameChannel = cleanText(newName);
+    const cleanNameChannel = getFilteredChannelName(newName);
     const editedChannel = { name: cleanNameChannel };
 
     const pathToRenameChannel = [routes.channelsPath(), changingChannelId].join('/');
@@ -46,23 +42,13 @@ const ModalRenameChannel = () => {
         },
       });
       if (response.data) {
-        dispatch(setNewChannelName({ id: response.data.id, newName: response.data.name }));
         handleSetShowModalRenameChannel();
-        dispatch(setShowNotifyRenameChannel());
+        toast.success(t('channels.renamed'));
       }
     } catch (e) {
       console.log(e);
     }
   };
-
-  useEffect(() => {
-    socket.on('renameChannel', (currentRenameChannel) => {
-      dispatch(setNewChannelName({ id: currentRenameChannel.id, name: currentRenameChannel.name }));
-    });
-    return () => {
-      socket.off('renameChannel');
-    };
-  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -78,11 +64,11 @@ const ModalRenameChannel = () => {
 
   const isUniqueChannelName = (name) => {
     const checkCannels = channels.filter((channel) => channel.name === name);
-    return checkCannels.length <= 0;
+    return !(checkCannels.length > 0);
   };
 
   const schema = yup.object().shape({
-    renameChannelName: yup.string()
+    name: yup.string()
       .required(t('validation.required'))
       .min(3, t('validation.min'))
       .max(20, t('validation.max'))
@@ -96,31 +82,33 @@ const ModalRenameChannel = () => {
       </Modal.Header>
       <Modal.Body>
         <Formik
-          initialValues={{ renameChannelName: activeChannelForRename.name }}
+          initialValues={{ name: activeChannelForRename.name }}
           validationSchema={schema}
           onSubmit={(values) => {
-            handleSetNewChannelName(values.renameChannelName, token, activeChannelForRename.id);
+            handleSetNewChannelName(values.name, token, activeChannelForRename.id);
           }}
         >
-          {({ handleChange, handleBlur, values }) => (
-            <Form noValidate className="mb-2">
-              <Field
-                type="text"
-                name="renameChannelName"
-                aria-label={t('channels.editChannelName')}
-                autoComplete="off"
-                placeholder=""
-                className="form-control"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.renameChannelName}
-                innerRef={inputRef}
-              />
-              <ErrorMessage
-                component="div"
-                name="renameChannelName"
-                className="text-danger"
-              />
+          {({
+            handleChange, handleBlur, handleSubmit, values, touched, errors,
+          }) => (
+            <Form onSubmit={handleSubmit} className="mb-2">
+              <Form.Group>
+                <Form.Label visuallyHidden>{t('channels.channelName')}</Form.Label>
+                <Form.Control
+                  name="name"
+                  id="name"
+                  className="mb-2"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.name}
+                  ref={inputRef}
+                  isInvalid={touched.name
+                    && (!!errors.name)}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.name}
+                </Form.Control.Feedback>
+              </Form.Group>
               <Modal.Footer>
                 <Button variant="secondary" onClick={handleSetShowModalRenameChannel}>
                   {t('modals.cancel')}

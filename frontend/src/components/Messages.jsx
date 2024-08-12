@@ -1,28 +1,25 @@
 import React, { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import { Form, InputGroup, Button } from 'react-bootstrap';
-import { io } from 'socket.io-client';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { ArrowRightSquare } from 'react-bootstrap-icons';
 import * as yup from 'yup';
 
-import { getMessages, addMessage, getCountOfMessages } from '../slices/messageSlice';
+import { getMessages, getCountOfMessages } from '../slices/messageSlice';
 import { getActiveChannelId, getActiveChannelName } from '../slices/channelSlice';
 import routes from '../routes';
 import { getToken, selectUser } from '../slices/authSlice';
-import cleanText from '../profanity';
-
-const socket = io();
+import { useProfanity } from '../hooks';
 
 const Messages = () => {
-  const dispatch = useDispatch();
   const { t } = useTranslation();
+  const profanity = useProfanity();
+  const getFilteredMessage = (message) => profanity(message).trim();
 
   const token = useSelector(getToken);
   const user = useSelector(selectUser);
-  console.log(user);
 
   const inputRef = useRef(null);
 
@@ -33,20 +30,10 @@ const Messages = () => {
   const countOfMessages = useSelector((state) => getCountOfMessages(state, activeChannelId));
 
   useEffect(() => {
-    socket.on('newMessage', (currentMessage) => {
-      dispatch(addMessage(currentMessage));
-    });
-    return () => {
-      socket.off('newMessage');
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
     inputRef.current.focus();
   }, [activeChannelName]);
 
   const handleSubmitMessage = async (newMessage) => {
-    console.log('newMessage', newMessage);
     try {
       await axios.post(routes.messagesPath(), newMessage, {
         headers: {
@@ -60,7 +47,7 @@ const Messages = () => {
   };
 
   const newMessageFunc = (value, channelId, username) => (
-    { body: cleanText(value), channelId, username }
+    { body: getFilteredMessage(value), channelId, username }
   );
 
   const validationSchema = yup.object().shape({
