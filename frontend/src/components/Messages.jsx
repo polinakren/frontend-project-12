@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { Formik } from 'formik';
-import { Form, InputGroup, Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { animateScroll } from 'react-scroll';
+import { Form, InputGroup, Button } from 'react-bootstrap';
 import { ArrowRightSquare } from 'react-bootstrap-icons';
+import { Formik } from 'formik';
+import axios from 'axios';
 import * as yup from 'yup';
 
 import { getMessages, getCountOfMessages } from '../slices/messageSlice';
@@ -33,6 +34,10 @@ const Messages = () => {
     inputRef.current.focus();
   }, [activeChannelName]);
 
+  useEffect(() => {
+    animateScroll.scrollToBottom({ containerId: 'messages-box', delay: 0, duration: 0 });
+  }, [messages?.length]);
+
   const handleSubmitMessage = async (newMessage) => {
     try {
       await axios.post(routes.messagesPath(), newMessage, {
@@ -58,69 +63,67 @@ const Messages = () => {
   });
 
   return (
-    <div className="col p-0 h-100">
-      <div className="d-flex flex-column h-100">
-        <div className="bg-light mb-4 p-3 shadow-sm small">
-          <p className="m-0">
-            <b>
-              {`# ${activeChannelName}`}
-            </b>
-          </p>
-          <span className="text-muted">
-            {countOfMessages}
-            {' '}
-            {t('chat.messageCount', { count: countOfMessages })}
-          </span>
-        </div>
-        <div id="messages-box" className="chat-messages overflow-auto px-5 ">
-          {messages
-            .filter((message) => message.channelId === activeChannelId)
-            .map((message) => (
-              <div key={message.id} className="text-break mb-2">
-                <b key={message.channelId}>{message.username}</b>
-                {': '}
-                {message.body}
-              </div>
-            ))}
-        </div>
-        <div className="mt-auto px-5 py-3">
-          <Formik
-            initialValues={{ message: '' }}
-            validationSchema={validationSchema}
-            onSubmit={(values, { resetForm }) => {
-              const newMessage = newMessageFunc(
-                values.message,
-                activeChannelId,
-                user,
-              );
-              handleSubmitMessage(newMessage);
-              resetForm();
-            }}
-          >
-            {({
-              handleChange, handleBlur, values, handleSubmit, isSubmitting,
-            }) => (
-              <Form onSubmit={handleSubmit} noValidate className="py-1 border rounded-2">
-                <InputGroup>
-                  <Form.Control
-                    ref={inputRef}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values.message}
-                    name="message"
-                    aria-label={t('chat.newMessage')}
-                    placeholder={t('chat.inputMesage')}
-                    className="border-0 p-0 ps-2"
-                  />
-                  <Button disabled={values.message === '' || isSubmitting} variant="group-vertical" type="submit">
-                    <ArrowRightSquare size={20} />
-                    <span className="visually-hidden">{t('chat.send')}</span>
-                  </Button>
-                </InputGroup>
-              </Form>
-            )}
-          </Formik>
-        </div>
+    <div className="d-flex flex-column h-100">
+      <div className="bg-light mb-4 p-3 shadow-sm small">
+        <p className="m-0">
+          <b>
+            {`# ${activeChannelName}`}
+          </b>
+        </p>
+        <span className="text-muted">
+          {countOfMessages}
+          {' '}
+          {t('chat.messageCount', { count: countOfMessages })}
+        </span>
+      </div>
+      <div id="messages-box" className="chat-messages overflow-auto px-5 ">
+        {messages
+          .filter((message) => message.channelId === activeChannelId)
+          .map((message) => (
+            <div key={message.id} className="text-break mb-2">
+              <b key={message.channelId}>{message.username}</b>
+              {': '}
+              {message.body}
+            </div>
+          ))}
+      </div>
+      <div className="mt-auto px-5 py-3">
+        <Formik
+          initialValues={{ message: '' }}
+          validationSchema={validationSchema}
+          onSubmit={(values, { resetForm }) => {
+            const newMessage = newMessageFunc(
+              values.message,
+              activeChannelId,
+              user,
+            );
+            handleSubmitMessage(newMessage);
+            resetForm();
+          }}
+        >
+          {({
+            handleChange, handleBlur, values, handleSubmit, isSubmitting,
+          }) => (
+            <Form onSubmit={handleSubmit} noValidate className="py-1 border rounded-2">
+              <InputGroup>
+                <Form.Control
+                  ref={inputRef}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.message}
+                  name="message"
+                  aria-label={t('chat.newMessage')}
+                  placeholder={t('chat.inputMesage')}
+                  className="border-0 p-0 ps-2"
+                />
+                <Button disabled={values.message === '' || isSubmitting} variant="group-vertical" type="submit">
+                  <ArrowRightSquare size={20} />
+                  <span className="visually-hidden">{t('chat.send')}</span>
+                </Button>
+              </InputGroup>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );

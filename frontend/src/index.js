@@ -3,14 +3,13 @@ import ReactDOM from 'react-dom/client';
 
 import './assets/style.scss';
 import './index.css';
-import App from './App';
-import Init from './init';
+import init from './init';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <Init>
-      <App />
-    </Init>
-  </React.StrictMode>,
-);
+const app = async () => {
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+
+  const vdom = await init();
+  root.render(<React.StrictMode>{vdom}</React.StrictMode>);
+};
+
+app();
