@@ -1,7 +1,7 @@
 import React from 'react';
 import i18next from 'i18next';
 import { io } from 'socket.io-client';
-import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
+import { Provider as RollbarProvider } from '@rollbar/react';
 import Rollbar from 'rollbar';
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -18,8 +18,6 @@ const rollbarInit = {
   environment: process.env.NODE_ENV,
 };
 
-const rollbarConfig = new Rollbar(rollbarInit);
-
 const Init = ({ children }) => {
   i18next
     .use(initReactI18next)
@@ -27,24 +25,20 @@ const Init = ({ children }) => {
       resources,
       debug: true,
       fallbackLng: 'ru',
-      interpolation: {
-        escapeValue: false,
-      },
     });
 
-  const newSocket = io();
+  const socket = io();
+  const rollbarConfig = new Rollbar(rollbarInit);
 
   return (
     <I18nextProvider i18n={i18next} defaultNS="translation">
       <ProfanityProvider>
         <RollbarProvider config={rollbarConfig}>
-          <ErrorBoundary>
-            <Provider store={store}>
-              <SocketProvider newSocket={newSocket}>
-                {children}
-              </SocketProvider>
-            </Provider>
-          </ErrorBoundary>
+          <Provider store={store}>
+            <SocketProvider newSocket={socket}>
+              {children}
+            </SocketProvider>
+          </Provider>
         </RollbarProvider>
       </ProfanityProvider>
     </I18nextProvider>

@@ -16,7 +16,7 @@ const SocketProvider = ({ children, newSocket }) => {
         socket.disconnect();
       }
     };
-  }, []);
+  }, [newSocket, socket]);
 
   useEffect(() => {
     if (socket) {

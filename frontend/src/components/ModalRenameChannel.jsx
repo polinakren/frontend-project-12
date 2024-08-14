@@ -51,28 +51,25 @@ const ModalRenameChannel = () => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.select();
-      }
-    }, 100);
+    inputRef.current.focus();
   }, []);
 
   const channels = useSelector(getChannels);
   const activeChannelForRename = useSelector(getActiveChannelForRename);
 
-  const isUniqueChannelName = (name) => {
-    const checkCannels = channels.filter((channel) => channel.name === name);
-    return !(checkCannels.length > 0);
-  };
+  // const isUniqueChannelName = (name) => {
+  //   const checkCannels = channels.filter((channel) => channel.name === name);
+  //   return !(checkCannels.length > 0);
+  // };
 
   const schema = yup.object().shape({
-    name: yup.string()
+    name: yup
+      .string()
+      .trim()
       .required(t('validation.required'))
       .min(3, t('validation.min'))
       .max(20, t('validation.max'))
-      .test('is-unique', t('validation.uniq'), (value) => isUniqueChannelName(value)),
+      .notOneOf(channels, t('validation.uniq')),
   });
 
   return (
@@ -93,7 +90,6 @@ const ModalRenameChannel = () => {
           }) => (
             <Form onSubmit={handleSubmit} className="mb-2">
               <Form.Group>
-                <Form.Label visuallyHidden>{t('channels.channelName')}</Form.Label>
                 <Form.Control
                   name="name"
                   id="name"
@@ -105,6 +101,7 @@ const ModalRenameChannel = () => {
                   isInvalid={touched.name
                     && (!!errors.name)}
                 />
+                <label className="visually-hidden" htmlFor="name">{t('channels.channelName')}</label>
                 <Form.Control.Feedback type="invalid">
                   {errors.name}
                 </Form.Control.Feedback>
