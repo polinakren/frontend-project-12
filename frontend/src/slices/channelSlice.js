@@ -79,6 +79,6 @@ export const getActiveChannelName = (state) => {
 export const getShowModalAddChannel = (state) => state.channels.showModalAddChannel;
 export const getShowModalRenameChannel = (state) => state.channels.showModalRenameChannel;
 export const getShowModalDeleteChannel = (state) => state.channels.showModalDeleteChannel;
-export const getActiveChannelForRename = (state) => state.channels.activeChannelForRename;
+export const getActiveChannelForChange = (state) => state.channels.activeChannelForRename;
 
 export default channelsSlice.reducer;

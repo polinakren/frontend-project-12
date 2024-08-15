@@ -12,7 +12,7 @@ import { getMessages, getCountOfMessages } from '../slices/messageSlice';
 import { getActiveChannelId, getActiveChannelName } from '../slices/channelSlice';
 import routes from '../routes';
 import { getToken, selectUser } from '../slices/authSlice';
-import { useProfanity } from '../hooks';
+import useProfanity from '../hooks';
 
 const Messages = () => {
   const { t } = useTranslation();

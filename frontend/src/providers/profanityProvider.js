@@ -1,6 +1,6 @@
 import filter from 'leo-profanity';
 import { useCallback } from 'react';
-import { ProfanityContext } from '../context';
+import ProfanityContext from '../context';
 
 const ProfanityProvider = ({ children }) => {
   filter.loadDictionary('en');

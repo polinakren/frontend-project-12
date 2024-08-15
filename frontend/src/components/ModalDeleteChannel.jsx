@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 import {
+  getActiveChannelForChange,
   setActiveChannel,
   setShowModalDeleteChannel,
-  getActiveChannelForRename,
 } from '../slices/channelSlice.js';
 import { deleteMessagesDuringDeleteChannel } from '../slices/messageSlice';
 import routes from '../routes.js';
@@ -24,7 +24,7 @@ const ModalDeleteChannel = () => {
     dispatch(setShowModalDeleteChannel());
   };
 
-  const activeChannelForDelete = useSelector(getActiveChannelForRename);
+  const activeChannelForDelete = useSelector(getActiveChannelForChange);
 
   const handleSetDeleteChannel = async (userToken, deletedChannelId) => {
     const pathToDeleteChannel = [routes.channelsPath(), deletedChannelId].join('/');

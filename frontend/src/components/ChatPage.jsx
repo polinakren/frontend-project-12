@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 import routes from '../routes';
 import Channels from './Channels.jsx';
@@ -19,6 +20,7 @@ import ModalDeleteChannel from './ModalDeleteChannel.jsx';
 
 const ChatPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
 
@@ -38,6 +40,9 @@ const ChatPage = () => {
         dispatch(setChannels(channelsData));
       } catch (e) {
         console.log(e);
+        if (e.response?.status === 401) {
+          navigate(routes.loginPagePath());
+        }
       }
     };
 
@@ -56,6 +61,9 @@ const ChatPage = () => {
         dispatch(loadMessages(messagesData));
       } catch (e) {
         console.log(e);
+        if (e.response?.status === 401) {
+          navigate(routes.loginPagePath());
+        }
       }
     };
 

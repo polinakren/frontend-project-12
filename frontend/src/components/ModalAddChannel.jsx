@@ -12,7 +12,7 @@ import {
 } from '../slices/channelSlice.js';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice.js';
-import { useProfanity } from '../hooks';
+import useProfanity from '../hooks';
 
 const ModalAddChannel = () => {
   const dispatch = useDispatch();
@@ -54,17 +54,14 @@ const ModalAddChannel = () => {
     }
   };
 
-  const isUniqueChannelName = (name) => {
-    const checkChannels = channels.filter((channel) => channel.name === name);
-    return !(checkChannels.length > 0);
-  };
-
   const schema = yup.object().shape({
-    name: yup.string()
+    name: yup
+      .string()
+      .trim()
       .required(t('validation.required'))
       .min(3, t('validation.min'))
       .max(20, t('validation.max'))
-      .test('is-unique', t('validation.uniq'), (value) => isUniqueChannelName(value)),
+      .notOneOf(channels, t('validation.uniq')),
   });
 
   return (
@@ -79,6 +76,8 @@ const ModalAddChannel = () => {
           onSubmit={(values) => {
             handleAddChannel(values.name, token);
           }}
+          validateOnBlur={false}
+          validateOnChange={false}
         >
           {({
             handleChange, handleBlur, handleSubmit, values, touched, errors,

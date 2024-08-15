@@ -10,11 +10,11 @@ import { toast } from 'react-toastify';
 import {
   getChannels,
   setShowModalRenameChannel,
-  getActiveChannelForRename,
+  getActiveChannelForChange,
 } from '../slices/channelSlice';
 import routes from '../routes.js';
 import { getToken } from '../slices/authSlice';
-import { useProfanity } from '../hooks';
+import useProfanity from '../hooks';
 
 const ModalRenameChannel = () => {
   const dispatch = useDispatch();
@@ -55,12 +55,7 @@ const ModalRenameChannel = () => {
   }, []);
 
   const channels = useSelector(getChannels);
-  const activeChannelForRename = useSelector(getActiveChannelForRename);
-
-  // const isUniqueChannelName = (name) => {
-  //   const checkCannels = channels.filter((channel) => channel.name === name);
-  //   return !(checkCannels.length > 0);
-  // };
+  const activeChannelForRename = useSelector(getActiveChannelForChange);
 
   const schema = yup.object().shape({
     name: yup

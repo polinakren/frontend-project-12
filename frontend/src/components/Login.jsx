@@ -1,20 +1,22 @@
 import {
   Button, Form, Col, Container, Card, Row, FloatingLabel,
 } from 'react-bootstrap';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { useRef, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
+import { toast } from 'react-toastify';
 
 import img from '../assets/avatar.jpg';
 import routes from '../routes';
 import { loginUser } from '../slices/authSlice.js';
 
 const Login = () => {
-  const inputRef = useRef();
+  const inputRef = useRef(null);
+  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [authFailed, setAuthFailed] = useState(false);
@@ -45,19 +47,25 @@ const Login = () => {
           username: values.username,
           password: values.password,
         });
-        if (response.data) {
-          const { token, username } = response.data;
-          dispatch(loginUser({ token, username }));
-          const tokenValueInStorage = localStorage.getItem('token');
-          if (tokenValueInStorage && tokenValueInStorage.length > 0) {
-            navigate(routes.chatPagePath());
-          }
-        } else {
-          navigate(routes.loginPagePath());
-        }
+        const { token, username } = response.data;
+        dispatch(loginUser({ token, username }));
+
+        const { from } = location.state || { from: { pathname: routes.chatPagePath() } };
+        navigate(from);
       } catch (e) {
         console.log(e);
         setAuthFailed(true);
+
+        if (!e.isAxiosError) {
+          toast.error(t('errors.unknown'));
+          return;
+        }
+
+        if (e.response?.status === 401) {
+          inputRef.current.select();
+        } else {
+          toast.error(t('errors.network'));
+        }
       }
     },
   });
